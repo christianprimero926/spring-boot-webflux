@@ -55,16 +55,31 @@ public class ProductController {
 
 	@GetMapping("/show_all-full")
 	public String showAllFull(Model model) {
-		
+
 		Flux<Product> products = dao.findAll().map(product -> {
 			product.setName(product.getName().toUpperCase());
 			return product;
 		}).repeat(5000);
-		
-		model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 1));
+
+		model.addAttribute("products", products);
 		model.addAttribute("tittle", "Listado de productos");
-		
+
 		return "show_all";
+	}
+
+	@GetMapping("/show_all-chunked")
+	public String showAllChunked(Model model) {
+
+		Flux<Product> products = dao.findAll().map(product -> {
+			
+			product.setName(product.getName().toUpperCase());
+			return product;
+		}).repeat(5000);
+
+		model.addAttribute("products", products);
+		model.addAttribute("tittle", "Listado de productos");
+
+		return "show_all-chunked";
 	}
 
 }
