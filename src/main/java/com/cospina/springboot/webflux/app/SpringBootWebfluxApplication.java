@@ -1,5 +1,7 @@
 package com.cospina.springboot.webflux.app;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,10 @@ public class SpringBootWebfluxApplication implements CommandLineRunner{
 				new Product("Mica Cómoda 5 Cajones", 150.89),
 				new Product("TV Sony Bravia OLED 4K Ultra HD", 2255.89)				
 				)
-		.flatMap(product -> dao.save(product))
+		.flatMap(product -> {
+			product.setCreateAt(new Date());
+			return dao.save(product);	
+		})
 		.subscribe(product -> log.info("Insert: " + product.getId() + " " + product.getName()));
 	}
 
