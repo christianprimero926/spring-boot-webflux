@@ -4,55 +4,55 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Document(collection = "products")
 public class Product {
+    @Id
+    private String id;
+    private String name;
+    private Double price;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date createAt;
 
-	@Id
-	private String id;
+    public Product(String name, Double price) {
+        this.name = name;
+        this.price = price;
+    }
 
-	private String name;
-	private Double price;
-	private Date createAt;
+    public Product() {
+    }
 
-	public Product(String name, Double price) {
-		this.name = name;
-		this.price = price;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public Product() {
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Double getPrice() {
+        return price;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
-	public Double getPrice() {
-		return price;
-	}
+    public Date getCreateAt() {
+        return createAt;
+    }
 
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-
-	public Date getCreateAt() {
-		return createAt;
-	}
-
-	public void setCreateAt(Date createAt) {
-		this.createAt = createAt;
-	}
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
+    }
 
 }
