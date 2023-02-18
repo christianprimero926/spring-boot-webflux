@@ -1,7 +1,7 @@
 package com.cospina.springboot.webflux.app.controller;
 
-import java.time.Duration;
-
+import com.cospina.springboot.webflux.app.models.documents.Product;
+import com.cospina.springboot.webflux.app.models.services.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,77 +9,62 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
-
-import com.cospina.springboot.webflux.app.models.dao.ProductDao;
-import com.cospina.springboot.webflux.app.models.documents.Product;
-
 import reactor.core.publisher.Flux;
+
+import java.time.Duration;
 
 @Controller
 public class ProductController {
 
-	@Autowired
-	private ProductDao dao;
+    @Autowired
+    private ProductService service;
 
-	private static final Logger log = LoggerFactory.getLogger(ProductController.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
-	@GetMapping({ "/show_all", "/" })
-	public String showAll(Model model) {
-		Flux<Product> products = dao.findAll().map(product -> {
-			product.setName(product.getName().toUpperCase());
-			return product;
-		});
+    @GetMapping({"/show_all", "/"})
+    public String showAll(Model model) {
+        Flux<Product> products = service.findAllWithNameUpperCase();
 
-		products.subscribe(prod -> log.info(prod.getName()));
+        products.subscribe(prod -> log.info(prod.getName()));
 
-		model.addAttribute("products", products);
-		model.addAttribute("tittle", "Listado de productos");
+        model.addAttribute("products", products);
+        model.addAttribute("tittle", "Listado de productos");
 
-		return "show_all";
-	}
+        return "show_all";
+    }
 
-	@GetMapping("/show_all-datadriver")
-	public String showAllDataDriver(Model model) {
-		Flux<Product> products = dao.findAll().map(product -> {
-			product.setName(product.getName().toUpperCase());
-			return product;
-		}).delayElements(Duration.ofSeconds(1));
+    @GetMapping("/show_all-datadriver")
+    public String showAllDataDriver(Model model) {
+        Flux<Product> products = service.findAllWithNameUpperCase().delayElements(Duration.ofSeconds(1));
 
-		products.subscribe(prod -> log.info(prod.getName()));
+        products.subscribe(prod -> log.info(prod.getName()));
 
-		model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 1));
-		model.addAttribute("tittle", "Listado de productos");
+        model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 1));
+        model.addAttribute("tittle", "Listado de productos");
 
-		return "show_all";
-	}
+        return "show_all";
+    }
 
-	@GetMapping("/show_all-full")
-	public String showAllFull(Model model) {
+    @GetMapping("/show_all-full")
+    public String showAllFull(Model model) {
 
-		Flux<Product> products = dao.findAll().map(product -> {
-			product.setName(product.getName().toUpperCase());
-			return product;
-		}).repeat(5000);
+        Flux<Product> products = service.findAllWithNameUpperCaseRepeat();
 
-		model.addAttribute("products", products);
-		model.addAttribute("tittle", "Listado de productos");
+        model.addAttribute("products", products);
+        model.addAttribute("tittle", "Listado de productos");
 
-		return "show_all";
-	}
+        return "show_all";
+    }
 
-	@GetMapping("/show_all-chunked")
-	public String showAllChunked(Model model) {
+    @GetMapping("/show_all-chunked")
+    public String showAllChunked(Model model) {
 
-		Flux<Product> products = dao.findAll().map(product -> {
-			
-			product.setName(product.getName().toUpperCase());
-			return product;
-		}).repeat(5000);
+        Flux<Product> products = service.findAllWithNameUpperCaseRepeat();
 
-		model.addAttribute("products", products);
-		model.addAttribute("tittle", "Listado de productos");
+        model.addAttribute("products", products);
+        model.addAttribute("tittle", "Listado de productos");
 
-		return "show_all-chunked";
-	}
+        return "show_all-chunked";
+    }
 
 }
