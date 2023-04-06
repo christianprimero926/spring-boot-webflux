@@ -2,21 +2,21 @@ package com.cospina.springboot.webflux.app.controller;
 
 import com.cospina.springboot.webflux.app.models.documents.Product;
 import com.cospina.springboot.webflux.app.models.services.ProductService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Date;
 
 @SessionAttributes("product")
 @Controller
@@ -80,11 +80,21 @@ public class ProductController {
     }
 
     @PostMapping("/form")
-    public Mono<String> save(Product product, SessionStatus status) {
-        status.setComplete();
-        return service.save(product).doOnNext(prod -> {
-            log.info("Producto almacenado: " + prod.getName() + " Id: " + prod.getId());
-        }).thenReturn("redirect:/show_all");
+    public Mono<String> save(@Valid @ModelAttribute("product") Product product, BindingResult result, Model model, SessionStatus status) {
+        if (result.hasErrors()){
+            model.addAttribute("title", "Errores en el formulario Producto");
+            model.addAttribute("button", "Guardar");
+            return Mono.just("form");
+        } else {
+            status.setComplete();
+            if (product.getCreateAt()==null){
+                product.setCreateAt(new Date());
+            }
+            return service.save(product).doOnNext(prod -> {
+                log.info("Producto almacenado: " + prod.getName() + " Id: " + prod.getId());
+            }).thenReturn("redirect:/show_all?success=producto+guardado+con+exito");
+        }
+
     }
 
     @GetMapping("/show_all-datadriver")

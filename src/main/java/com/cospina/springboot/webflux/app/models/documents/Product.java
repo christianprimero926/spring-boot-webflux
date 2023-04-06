@@ -2,6 +2,8 @@ package com.cospina.springboot.webflux.app.models.documents;
 
 import java.util.Date;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,7 +12,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Product {
     @Id
     private String id;
+    @NotEmpty
     private String name;
+    @NotNull
     private Double price;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
