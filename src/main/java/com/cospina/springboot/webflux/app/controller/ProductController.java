@@ -106,7 +106,7 @@ public class ProductController {
                     }
                     return Mono.just(p);
                 })
-//                Se puede simplificar de esta manera 
+//                Se puede simplificar de esta manera
 //                .flatMap(service::delete)
                 .flatMap(p -> {
                     log.info("Eliminando producto: " + p.getId() + "-" + p.getName());

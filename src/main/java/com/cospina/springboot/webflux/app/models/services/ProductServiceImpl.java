@@ -1,6 +1,8 @@
 package com.cospina.springboot.webflux.app.models.services;
 
+import com.cospina.springboot.webflux.app.models.dao.CategoryDao;
 import com.cospina.springboot.webflux.app.models.dao.ProductDao;
+import com.cospina.springboot.webflux.app.models.documents.Category;
 import com.cospina.springboot.webflux.app.models.documents.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import reactor.core.publisher.Mono;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductDao dao;
+    @Autowired
+    private CategoryDao categoryDao;
 
     @Override
     public Flux<Product> findAll() {
@@ -43,5 +47,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Mono<Void> delete(Product product) {
         return dao.delete(product);
+    }
+
+    @Override
+    public Flux<Category> findAllCategory() {
+        return categoryDao.findAll();
+    }
+
+    @Override
+    public Mono<Category> findCategoryById(String id) {
+        return categoryDao.findById(id);
+    }
+
+    @Override
+    public Mono<Category> saveCategory(Category category) {
+        return categoryDao.save(category);
     }
 }
