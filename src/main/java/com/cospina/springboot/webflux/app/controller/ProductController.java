@@ -22,10 +22,9 @@ import java.util.Date;
 @Controller
 public class ProductController {
 
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
     @Autowired
     private ProductService service;
-
-    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
     @GetMapping({"/show_all", "/"})
     public Mono<String> showAll(Model model) {
@@ -70,7 +69,7 @@ public class ProductController {
                     log.info("Producto: " + product.getName());
                 }).defaultIfEmpty(new Product())
                 .flatMap(p -> {
-                    if (p.getId() == null){
+                    if (p.getId() == null) {
                         return Mono.error(new InterruptedException("no Existe el prodcto"));
                     }
                     return Mono.just(p);
@@ -81,19 +80,40 @@ public class ProductController {
 
     @PostMapping("/form")
     public Mono<String> save(@Valid @ModelAttribute("product") Product product, BindingResult result, Model model, SessionStatus status) {
-        if (result.hasErrors()){
+        if (result.hasErrors()) {
             model.addAttribute("title", "Errores en el formulario Producto");
             model.addAttribute("button", "Guardar");
             return Mono.just("form");
         } else {
             status.setComplete();
-            if (product.getCreateAt()==null){
+            if (product.getCreateAt() == null) {
                 product.setCreateAt(new Date());
             }
             return service.save(product).doOnNext(prod -> {
                 log.info("Producto almacenado: " + prod.getName() + " Id: " + prod.getId());
             }).thenReturn("redirect:/show_all?success=producto+guardado+con+exito");
         }
+
+    }
+
+    @GetMapping("/delete/{id}")
+    public Mono<String> delete(@PathVariable String id) {
+        return service.findById(id)
+                .defaultIfEmpty(new Product())
+                .flatMap(p -> {
+                    if (p.getId() == null) {
+                        return Mono.error(new InterruptedException("No existe el prodcto"));
+                    }
+                    return Mono.just(p);
+                })
+//                Se puede simplificar de esta manera 
+//                .flatMap(service::delete)
+                .flatMap(p -> {
+                    log.info("Eliminando producto: " + p.getId() + "-" + p.getName());
+                    return service.delete(p);
+                })
+                .then(Mono.just("redirect:/show_all?success=producto+eliminado+con+exito"))
+                .onErrorResume(ex -> Mono.just("redirect:/show_all?error=no+existe+el+producto"));
 
     }
 
